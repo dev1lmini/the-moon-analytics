@@ -1,6 +1,4 @@
-<p align="center">
-  <img alt="posthoglogo" src="https://user-images.githubusercontent.com/65415371/205059737-c8a4f836-4889-4654-902e-f302b187b6a0.png">
-</p>
+
 <p align="center">
   <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 <a href='https://posthog.com/contributors'><img src='https://img.shields.io/badge/all_contributors-251-orange.svg?style=flat-square' /></a>
@@ -12,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://posthog.com/docs">Docs</a> - <a href="https://posthog.com/community">Community</a> - <a href="https://posthog.com/roadmap">Roadmap</a> - <a href="https://posthog.com/changelog">Changelog</a> - <a href="https://github.com/PostHog/posthog/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a> 
+  <a href="https://posthog.com/docs">Docs</a> - <a href="https://posthog.com/community">Community</a> - <a href="https://posthog.com/roadmap">Roadmap</a> - <a href="https://posthog.com/changelog">Changelog</a> - <a href="https://github.com/PostHog/posthog/issues/new?assignees=&labels=bug&template=bug_report.md">Bug reports</a>
 </p>
 
 ## PostHog is an all-in-one, open source platform for building better products
@@ -45,9 +43,9 @@ The fastest and most reliable way to get started with PostHog is signing up for 
 
 You can deploy a hobby instance in one line on Linux with Docker (recommended 4GB memory):
 
- ```bash 
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/posthog/posthog/HEAD/bin/deploy-hobby)" 
- ``` 
+ ```bash
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/posthog/posthog/HEAD/bin/deploy-hobby)"
+ ```
 
 Open source deployments should scale to approximately 100k events per month, after which we recommend migrating to a PostHog Cloud instance. See our [docs for more info and limitations](https://posthog.com/docs/self-host/open-source/deployment).
 
@@ -109,7 +107,7 @@ PostHog operates in public as much as possible. We detail how we work and our le
 
 ## Open-source vs. paid
 
-This repo is available under the [MIT expat license](https://github.com/PostHog/posthog/blob/master/LICENSE), except for the `ee` directory (which has it's [license here](https://github.com/PostHog/posthog/blob/master/ee/LICENSE)) if applicable. 
+This repo is available under the [MIT expat license](https://github.com/PostHog/posthog/blob/master/LICENSE), except for the `ee` directory (which has it's [license here](https://github.com/PostHog/posthog/blob/master/ee/LICENSE)) if applicable.
 
 Need *absolutely 💯% FOSS*? Check out our [posthog-foss](https://github.com/PostHog/posthog-foss) repository, which is purged of all proprietary code and features.
 
