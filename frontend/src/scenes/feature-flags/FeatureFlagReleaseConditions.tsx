@@ -3,7 +3,6 @@ import { useActions, useValues } from 'kea'
 import { capitalizeFirstLetter, humanFriendlyNumber } from 'lib/utils'
 import { PropertyFilters } from 'lib/components/PropertyFilters/PropertyFilters'
 import { featureFlagLogic } from './featureFlagLogic'
-import { featureFlagLogic as enabledFeaturesLogic } from 'lib/logic/featureFlagLogic'
 import './FeatureFlag.scss'
 import { IconCopy, IconDelete, IconPlus, IconSubArrowRight, IconErrorOutline } from 'lib/lemon-ui/icons'
 import { LemonDivider } from 'lib/lemon-ui/LemonDivider'
@@ -15,11 +14,11 @@ import { LemonBanner } from 'lib/lemon-ui/LemonBanner'
 import { urls } from 'scenes/urls'
 import { Spinner } from 'lib/lemon-ui/Spinner/Spinner'
 import { router } from 'kea-router'
-import { FEATURE_FLAGS, INSTANTLY_AVAILABLE_PROPERTIES } from 'lib/constants'
+import { INSTANTLY_AVAILABLE_PROPERTIES } from 'lib/constants'
 import { LemonTag } from 'lib/lemon-ui/LemonTag/LemonTag'
 import { allOperatorsToHumanName } from 'lib/components/DefinitionPopover/utils'
 import { cohortsModel } from '~/models/cohortsModel'
-import { LemonSelect } from '@posthog/lemon-ui'
+import { LemonSelect, Link } from '@posthog/lemon-ui'
 import { isPropertyFilterWithOperator } from 'lib/components/PropertyFilters/utils'
 import clsx from 'clsx'
 
@@ -54,7 +53,6 @@ export function FeatureFlagReleaseConditions({
         addConditionSet,
     } = useActions(featureFlagLogic)
     const { cohortsById } = useValues(cohortsModel)
-    const { featureFlags } = useValues(enabledFeaturesLogic)
 
     const filterGroups: FeatureFlagGroupType[] = isSuper
         ? featureFlag.filters.super_groups || []
@@ -128,10 +126,10 @@ export function FeatureFlagReleaseConditions({
                             These properties aren't immediately available on first page load for unidentified persons.
                             This feature flag requires that at least one event is sent prior to becoming available to
                             your product or website.{' '}
-                            <a href="https://posthog.com/docs/integrate/client/js#bootstrapping-flags" target="_blank">
+                            <Link to="https://posthog.com/docs/integrate/client/js#bootstrapping-flags" target="_blank">
                                 {' '}
                                 Learn more about how to make feature flags available instantly.
-                            </a>
+                            </Link>
                         </LemonBanner>
                     )}
 
@@ -161,15 +159,14 @@ export function FeatureFlagReleaseConditions({
                                         ) : null}
 
                                         {property.type === 'cohort' ? (
-                                            <a
-                                                href={urls.cohort(property.value)}
+                                            <Link
+                                                to={urls.cohort(property.value)}
                                                 target="_blank"
-                                                rel="noopener"
                                                 className="simple-tag tag-light-blue text-primary-alt display-value"
                                             >
                                                 {(property.value && cohortsById[property.value]?.name) ||
                                                     `ID ${property.value}`}
-                                            </a>
+                                            </Link>
                                         ) : (
                                             [
                                                 ...(Array.isArray(property.value) ? property.value : [property.value]),
@@ -256,33 +253,28 @@ export function FeatureFlagReleaseConditions({
                                 />{' '}
                                 of <b>{aggregationTargetName}</b> in this set.{' '}
                             </div>
-                            {featureFlags[FEATURE_FLAGS.FEATURE_FLAG_ROLLOUT_UX] && (
-                                <div>
-                                    Will match approximately{' '}
-                                    {affectedUsers[index] !== undefined ? (
-                                        <b>
-                                            {`${
-                                                computeBlastRadiusPercentage(
-                                                    group.rollout_percentage,
-                                                    index
-                                                ).toPrecision(2) * 1
-                                                // Multiplying by 1 removes trailing zeros after the decimal
-                                                // point added by toPrecision
-                                            }% `}
-                                        </b>
-                                    ) : (
-                                        <Spinner className="mr-1" />
-                                    )}{' '}
-                                    {affectedUsers[index] && affectedUsers[index] >= 0 && totalUsers
-                                        ? `(${humanFriendlyNumber(
-                                              Math.floor(
-                                                  (affectedUsers[index] * (group.rollout_percentage ?? 100)) / 100
-                                              )
-                                          )} / ${humanFriendlyNumber(totalUsers)})`
-                                        : ''}{' '}
-                                    of total {aggregationTargetName}.
-                                </div>
-                            )}
+                            <div>
+                                Will match approximately{' '}
+                                {affectedUsers[index] !== undefined ? (
+                                    <b>
+                                        {`${
+                                            computeBlastRadiusPercentage(group.rollout_percentage, index).toPrecision(
+                                                2
+                                            ) * 1
+                                            // Multiplying by 1 removes trailing zeros after the decimal
+                                            // point added by toPrecision
+                                        }% `}
+                                    </b>
+                                ) : (
+                                    <Spinner className="mr-1" />
+                                )}{' '}
+                                {affectedUsers[index] && affectedUsers[index] >= 0 && totalUsers
+                                    ? `(${humanFriendlyNumber(
+                                          Math.floor((affectedUsers[index] * (group.rollout_percentage ?? 100)) / 100)
+                                      )} / ${humanFriendlyNumber(totalUsers)})`
+                                    : ''}{' '}
+                                of total {aggregationTargetName}.
+                            </div>
                         </div>
                     )}
                     {nonEmptyVariants.length > 0 && (
@@ -394,7 +386,7 @@ export function FeatureFlagReleaseConditions({
     return (
         <>
             <div className={`feature-flag-form-row ${excludeTitle && 'mb-2'}`}>
-                <div data-attr="feature-flag-release-conditions">
+                <div data-attr="feature-flag-release-conditions" className="w-full">
                     {readOnly ? (
                         excludeTitle ? null : (
                             <h3 className="l3">{isSuper ? 'Super Release Conditions' : 'Release conditions'}</h3>
@@ -447,7 +439,7 @@ export function FeatureFlagReleaseConditions({
                             <Select.Option key={-1} value={-1}>
                                 Users
                             </Select.Option>
-                            {groupTypes.map((groupType) => (
+                            {Array.from(groupTypes.values()).map((groupType) => (
                                 <Select.Option key={groupType.group_type_index} value={groupType.group_type_index}>
                                     {capitalizeFirstLetter(aggregationLabel(groupType.group_type_index).plural)}
                                 </Select.Option>

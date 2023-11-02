@@ -18,6 +18,12 @@ module.exports = {
         react: {
             version: 'detect',
         },
+        'import/resolver': {
+            node: {
+                paths: ['eslint-rules'], // Add the directory containing your custom rules
+                extensions: ['.js', '.jsx', '.ts', '.tsx'], // Ensure ESLint resolves both JS and TS files
+            },
+        },
     },
     extends: [
         'eslint:recommended',
@@ -26,6 +32,7 @@ module.exports = {
         'plugin:eslint-comments/recommended',
         'plugin:storybook/recommended',
         'prettier',
+        'plugin:compat/recommended',
     ],
     globals,
     parser: '@typescript-eslint/parser',
@@ -36,7 +43,7 @@ module.exports = {
         ecmaVersion: 2018,
         sourceType: 'module',
     },
-    plugins: ['prettier', 'react', 'cypress', '@typescript-eslint', 'no-only-tests', 'jest'],
+    plugins: ['prettier', 'react', 'cypress', '@typescript-eslint', 'no-only-tests', 'jest', 'compat', 'posthog'],
     rules: {
         'no-console': ['error', { allow: ['warn', 'error'] }],
         'no-debugger': 'error',
@@ -90,7 +97,7 @@ module.exports = {
                 ],
             },
         ],
-        'react/forbid-elements': [
+        'posthog/warn-elements': [
             1,
             {
                 forbid: [
@@ -112,20 +119,12 @@ module.exports = {
                         message: 'use <LemonDivider> instead',
                     },
                     {
-                        element: 'Typography',
-                        message: 'use utility classes instead',
-                    },
-                    {
                         element: 'Card',
                         message: 'use utility classes instead',
                     },
                     {
                         element: 'Button',
                         message: 'use <LemonButton> instead',
-                    },
-                    {
-                        element: 'Input.TextArea',
-                        message: 'use <LemonTextArea> instead',
                     },
                     {
                         element: 'Input',
@@ -142,14 +141,6 @@ module.exports = {
                     {
                         element: 'Select',
                         message: 'use <LemonSelect> instead',
-                    },
-                    {
-                        element: 'a',
-                        message: 'use <Link> instead',
-                    },
-                    {
-                        element: 'ReactMarkdown',
-                        message: 'use <LemonMarkdown> instead',
                     },
                 ],
             },
@@ -181,6 +172,22 @@ module.exports = {
                     {
                         element: 'MonacoEditor',
                         message: 'use <CodeEditor> instead',
+                    },
+                    {
+                        element: 'Typography',
+                        message: 'use utility classes instead',
+                    },
+                    {
+                        element: 'Input.TextArea',
+                        message: 'use <LemonTextArea> instead',
+                    },
+                    {
+                        element: 'ReactMarkdown',
+                        message: 'use <LemonMarkdown> instead',
+                    },
+                    {
+                        element: 'a',
+                        message: 'use <Link> instead',
                     },
                 ],
             },
@@ -233,6 +240,16 @@ module.exports = {
             files: ['*.js'],
             rules: {
                 '@typescript-eslint/no-var-requires': 'off',
+            },
+        },
+        {
+            files: 'eslint-rules/**/*',
+            extends: ['eslint:recommended'],
+            rules: {
+                '@typescript-eslint/no-var-requires': 'off',
+            },
+            env: {
+                node: true,
             },
         },
     ],

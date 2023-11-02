@@ -1,4 +1,5 @@
 import { KeyMapping, PropertyFilterValue } from '~/types'
+import { Link } from './lemon-ui/Link'
 
 export interface KeyMappingInterface {
     event: Record<string, KeyMapping>
@@ -71,7 +72,12 @@ export const KEY_MAPPING: KeyMappingInterface = {
                 'The version of the browser that the user first used (first-touch). Used in combination with Browser.',
             examples: ['70', '79'],
         },
-
+        $raw_user_agent: {
+            label: 'Raw User Agent',
+            description:
+                'PostHog process information like browser, OS, and device type from the user agent string. This is the raw user agent string.',
+            examples: ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)'],
+        },
         $screen_height: {
             label: 'Screen Height',
             description: "The height of the user's entire screen (in pixels).",
@@ -192,17 +198,21 @@ export const KEY_MAPPING: KeyMappingInterface = {
         },
         $survey_response: {
             label: 'Survey Response',
-            description: 'What the user responded with to the survey',
+            description: 'The response value for the first question in the survey.',
             examples: ['I love it!', 5, "['choice 1', 'choice 3']"],
         },
         $survey_name: {
             label: 'Survey Name',
-            description: 'The name of the survey',
+            description: 'The name of the survey.',
             examples: ['Product Feedback for New Product', 'Home page NPS'],
+        },
+        $survey_questions: {
+            label: 'Survey Questions',
+            description: 'The questions asked in the survey.',
         },
         $survey_id: {
             label: 'Survey ID',
-            description: 'The unique identifier for the survey',
+            description: 'The unique identifier for the survey.',
         },
         $device: {
             label: 'Device',
@@ -664,7 +674,7 @@ export const KEY_MAPPING: KeyMappingInterface = {
             description: (
                 <span>
                     The duration of the session being tracked. Learn more about how PostHog tracks sessions in{' '}
-                    <a href="https://posthog.com/docs/user-guides/sessions">our documentation.</a>
+                    <Link to="https://posthog.com/docs/user-guides/sessions">our documentation.</Link>
                     <br /> <br />
                     Note, if the duration is formatted as a single number (not 'HH:MM:SS'), it's in seconds.
                 </span>
@@ -793,6 +803,35 @@ export function getKeyMapping(
             data.description = `${data.description} Data from the first time this user was seen.`
         }
         return data
+    } else if (value.startsWith('$survey_responded/')) {
+        const surveyId = value.replace(/^\$survey_responded\//, '')
+        if (surveyId) {
+            return {
+                label: `Survey Responded: ${surveyId}`,
+                description: `Whether the user responded to survey with ID: "${surveyId}".`,
+            }
+        }
+    } else if (value.startsWith('$survey_dismissed/')) {
+        const surveyId = value.replace(/^\$survey_dismissed\//, '')
+        if (surveyId) {
+            return {
+                label: `Survey Dismissed: ${surveyId}`,
+                description: `Whether the user dismissed survey with ID: "${surveyId}".`,
+            }
+        }
+    } else if (value.startsWith('$survey_response_')) {
+        const surveyIndex = value.replace(/^\$survey_response_/, '')
+        if (surveyIndex) {
+            const index = Number(surveyIndex) + 1
+            // yes this will return 21th, but I'm applying the domain logic of
+            // it being very unlikely that someone will have more than 20 questions,
+            // rather than hyper optimising the suffix.
+            const suffix = index === 1 ? 'st' : index === 2 ? 'nd' : index === 3 ? 'rd' : 'th'
+            return {
+                label: `Survey Response Question ID: ${surveyIndex}`,
+                description: `The response value for the ${index}${suffix} question in the survey.`,
+            }
+        }
     } else if (value.startsWith('$feature/')) {
         const featureFlagKey = value.replace(/^\$feature\//, '')
         if (featureFlagKey) {

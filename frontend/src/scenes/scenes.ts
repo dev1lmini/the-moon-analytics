@@ -3,7 +3,7 @@ import { Error404 as Error404Component } from '~/layout/Error404'
 import { ErrorNetwork as ErrorNetworkComponent } from '~/layout/ErrorNetwork'
 import { ErrorProjectUnavailable as ErrorProjectUnavailableComponent } from '~/layout/ErrorProjectUnavailable'
 import { urls } from 'scenes/urls'
-import { InsightShortId, PropertyFilterType, ReplayTabs } from '~/types'
+import { InsightShortId, PipelineTabs, PropertyFilterType, ReplayTabs } from '~/types'
 import { combineUrl } from 'kea-router'
 import { getDefaultEventsSceneQuery } from 'scenes/events/defaults'
 import { EventsQuery } from '~/queries/schema'
@@ -42,6 +42,11 @@ export const sceneConfigurations: Partial<Record<Scene, SceneConfig>> = {
     [Scene.Insight]: {
         projectBased: true,
         name: 'Insights',
+    },
+    [Scene.WebAnalytics]: {
+        projectBased: true,
+        name: 'Web Analytics',
+        layout: 'app-container',
     },
     [Scene.Cohorts]: {
         projectBased: true,
@@ -135,6 +140,10 @@ export const sceneConfigurations: Partial<Record<Scene, SceneConfig>> = {
         projectBased: true,
         name: 'Persons & Groups',
     },
+    [Scene.Pipeline]: {
+        projectBased: true,
+        name: 'Pipeline',
+    },
     [Scene.Experiments]: {
         projectBased: true,
         name: 'Experiments',
@@ -157,6 +166,10 @@ export const sceneConfigurations: Partial<Record<Scene, SceneConfig>> = {
     [Scene.Survey]: {
         projectBased: true,
         name: 'Survey',
+    },
+    [Scene.SurveyTemplates]: {
+        projectBased: true,
+        name: 'New survey',
     },
     [Scene.DataWarehouse]: {
         projectBased: true,
@@ -188,7 +201,7 @@ export const sceneConfigurations: Partial<Record<Scene, SceneConfig>> = {
         projectBased: true,
         name: 'Annotations',
     },
-    [Scene.Plugins]: {
+    [Scene.Apps]: {
         projectBased: true,
         name: 'Apps',
     },
@@ -314,6 +327,15 @@ export const sceneConfigurations: Partial<Record<Scene, SceneConfig>> = {
         name: 'Notebook',
         layout: 'app-raw',
     },
+    [Scene.Notebooks]: {
+        projectBased: true,
+        name: 'Notebooks',
+    },
+    [Scene.Canvas]: {
+        projectBased: true,
+        name: 'Canvas',
+        layout: 'app-raw',
+    },
 }
 
 const preserveParams = (url: string) => (_params: Params, searchParams: Params, hashParams: Params) => {
@@ -390,6 +412,7 @@ export const routes: Record<string, Scene> = {
     [urls.insightSubcription(':shortId' as InsightShortId, ':subscriptionId')]: Scene.Insight,
     [urls.insightSharing(':shortId' as InsightShortId)]: Scene.Insight,
     [urls.savedInsights()]: Scene.SavedInsights,
+    [urls.webAnalytics()]: Scene.WebAnalytics,
     [urls.actions()]: Scene.Actions, // TODO: remove when "simplify-actions" FF is released
     [urls.eventDefinitions()]: Scene.EventDefinitions,
     [urls.eventDefinition(':id')]: Scene.EventDefinition,
@@ -410,8 +433,15 @@ export const routes: Record<string, Scene> = {
     }, {} as Record<string, Scene>),
     [urls.replaySingle(':id')]: Scene.ReplaySingle,
     [urls.replayPlaylist(':id')]: Scene.ReplayPlaylist,
-    [urls.person('*', false)]: Scene.Person,
+    [urls.personByDistinctId('*', false)]: Scene.Person,
+    [urls.personByUUID('*', false)]: Scene.Person,
     [urls.persons()]: Scene.Persons,
+    [urls.pipeline()]: Scene.Pipeline,
+    // One entry for every available tab
+    ...Object.values(PipelineTabs).reduce((acc, tab) => {
+        acc[urls.pipeline(tab)] = Scene.Pipeline
+        return acc
+    }, {} as Record<string, Scene>),
     [urls.groups(':groupTypeIndex')]: Scene.Groups,
     [urls.group(':groupTypeIndex', ':groupKey', false)]: Scene.Group,
     [urls.group(':groupTypeIndex', ':groupKey', false, ':groupTab')]: Scene.Group,
@@ -423,6 +453,7 @@ export const routes: Record<string, Scene> = {
     [urls.earlyAccessFeature(':id')]: Scene.EarlyAccessFeature,
     [urls.surveys()]: Scene.Surveys,
     [urls.survey(':id')]: Scene.Survey,
+    [urls.surveyTemplates()]: Scene.SurveyTemplates,
     [urls.dataWarehouse()]: Scene.DataWarehouse,
     [urls.dataWarehouseTable(':id')]: Scene.DataWarehouseTable,
     [urls.dataWarehousePosthog()]: Scene.DataWarehousePosthog,
@@ -434,10 +465,10 @@ export const routes: Record<string, Scene> = {
     [urls.annotation(':id')]: Scene.Annotations,
     [urls.projectHomepage()]: Scene.ProjectHomepage,
     [urls.projectSettings()]: Scene.ProjectSettings,
-    [urls.projectApps()]: Scene.Plugins,
-    [urls.projectApp(':id')]: Scene.Plugins,
-    [urls.projectAppLogs(':id')]: Scene.Plugins,
-    [urls.projectAppSource(':id')]: Scene.Plugins,
+    [urls.projectApps()]: Scene.Apps,
+    [urls.projectApp(':id')]: Scene.Apps,
+    [urls.projectAppLogs(':id')]: Scene.Apps,
+    [urls.projectAppSource(':id')]: Scene.Apps,
     [urls.frontendApp(':id')]: Scene.FrontendAppScene,
     [urls.appMetrics(':pluginConfigId')]: Scene.AppMetrics,
     [urls.appHistoricalExports(':pluginConfigId')]: Scene.AppMetrics,
@@ -481,4 +512,6 @@ export const routes: Record<string, Scene> = {
     [urls.feedback()]: Scene.Feedback,
     [urls.feedback() + '/*']: Scene.Feedback,
     [urls.notebook(':shortId')]: Scene.Notebook,
+    [urls.notebooks()]: Scene.Notebooks,
+    [urls.canvas()]: Scene.Canvas,
 }
